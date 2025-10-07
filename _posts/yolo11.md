@@ -12,7 +12,7 @@ toc:  true
 
 深度学习对电脑有一定的性能要求，建议使用NVIDIA独立显卡在cuda环境进行GPU训练，在windows环境下我们可以使用以下命令查看电脑的NVIDIA显卡来查看电脑支持的支持情况。
 
-# nvidia-smi
+ nvidia-smi
 
 我当前的显卡支持cuda12.6版本，那么接下来我们需要来到英伟达显卡官网来下载所需要的cuda
 ### 1.2下载cuda和cudnn
