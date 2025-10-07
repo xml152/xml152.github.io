@@ -1,9 +1,9 @@
 - title: Email
-  url: mailto://vszhub@gmail.com
+  url: long123741@outlook.com
   icon: fas fa-envelope
-- title: Twitter
-  url: https://twitter.com/vszhub
-  icon: fab fa-twitter
+- title: Bilibili
+  url: https://space.bilibili.com/544625109?spm_id_from=333.1007.0.0
+  icon: fab fa-bilibili
 - title: GitHub
-  url: https://github.com/vszhub/not-pure-poole
+  url: https://github.com/xml152
   icon: fab fa-github
