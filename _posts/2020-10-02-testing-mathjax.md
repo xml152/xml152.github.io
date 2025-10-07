@@ -1,9 +1,9 @@
 ---
 layout: post
-title: YOLO11的环境部署与训练
-tags: [AI, yolo, YOLO, 机器视觉]
+title: Testing MathJax
+tags: mathjax
 math: true
-date: 2025-10-7
+date: 2020-10-02 15:32 +0800
 ---
 
 目录：
