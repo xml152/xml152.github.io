@@ -3,7 +3,7 @@
   icon: fas fa-envelope
 - title: Bilibili
   url: https://space.bilibili.com/544625109?spm_id_from=333.1007.0.0
-  icon: fa-brands fa-bilibili
+  icon: fab fa-bilibili
 - title: GitHub
   url: https://github.com/xml152
   icon: fab fa-github
