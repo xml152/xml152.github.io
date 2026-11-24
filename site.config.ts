@@ -36,9 +36,9 @@ export const site = {
     /** 头像放 public/ 目录下，或换成自己的图片地址 */
     avatar: '/avatar.jpg',
     /** 侧栏与关于页的一句话介绍 */
-    bio: '后端工程师 / 偶尔写点前端 / 看番、玩游戏，也认真写点东西。',
+    bio: '嵌入式 / Linux / 看番、玩游戏，什么都碰一点点。',
     location: 'Hangzhou, China',
-    email: 'hello@example.com',
+    email: 'long123741@outlook.com',
     github: 'https://github.com/xml152',
   },
 
