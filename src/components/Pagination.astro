@@ -1,0 +1,62 @@
+---
+import type { Page } from 'astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  page: Page;
+}
+
+const { page } = Astro.props;
+const { currentPage, lastPage, url } = page;
+
+const hrefFor = (n: number) => (n === 1 ? '/' : `/${n}/`);
+
+const items: (number | '...')[] = [];
+for (let i = 1; i <= lastPage; i += 1) {
+  if (i === 1 || i === lastPage || Math.abs(i - currentPage) <= 1) {
+    items.push(i);
+  } else if (items[items.length - 1] !== '...') {
+    items.push('...');
+  }
+}
+---
+
+{
+  lastPage > 1 && (
+    <nav class="pager" aria-label="分页导航">
+      {url.prev ? (
+        <a href={url.prev} aria-label="上一页">
+          <Icon name="arrow-left" size={15} />
+        </a>
+      ) : (
+        <span class="is-disabled" aria-hidden="true">
+          <Icon name="arrow-left" size={15} />
+        </span>
+      )}
+
+      {items.map((item) =>
+        item === '...' ? (
+          <span class="is-disabled" aria-hidden="true">
+            …
+          </span>
+        ) : item === currentPage ? (
+          <span class="is-current" aria-current="page">
+            {item}
+          </span>
+        ) : (
+          <a href={hrefFor(item)}>{item}</a>
+        ),
+      )}
+
+      {url.next ? (
+        <a href={url.next} aria-label="下一页">
+          <Icon name="arrow-right" size={15} />
+        </a>
+      ) : (
+        <span class="is-disabled" aria-hidden="true">
+          <Icon name="arrow-right" size={15} />
+        </span>
+      )}
+    </nav>
+  )
+}

@@ -1,0 +1,91 @@
+---
+import { site } from '../../site.config';
+import Icon from './Icon.astro';
+
+interface Props {
+  postCount: number;
+  tagCount: number;
+  latestTitle?: string;
+}
+
+const { postCount, tagCount, latestTitle = 'Hello, world' } = Astro.props;
+
+const marker = site.heading.includes(' 的') ? ' 的' : '的';
+const splitAt = site.heading.indexOf(marker);
+const head = splitAt >= 0 ? site.heading.slice(0, splitAt) : site.heading;
+const tail = splitAt >= 0 ? site.heading.slice(splitAt + marker.length) : '';
+const host = (() => {
+  try {
+    return new URL(site.url).host;
+  } catch {
+    return 'localhost';
+  }
+})();
+const latestShort = latestTitle.length > 22 ? `${latestTitle.slice(0, 22)}…` : latestTitle;
+const years = Math.max(1, new Date().getFullYear() - site.footer.since + 1);
+---
+
+<section class="hero" data-reveal>
+  <div class="hero__inner">
+    <div class="hero__content">
+      <span class="hero__badge"><i aria-hidden="true"></i> 正在记录 · 持续更新中</span>
+
+      <h1 class="hero__title">
+        {head}{tail && marker}{tail && <em>{tail}</em>}
+      </h1>
+
+      <p class="hero__desc">{site.description}</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#posts">
+          开始阅读
+          <Icon name="arrow-right" class="icon" size={16} />
+        </a>
+        <a class="btn btn--ghost" href="/archive/">
+          <Icon name="archive" class="icon" size={16} />
+          全部归档
+        </a>
+        <a class="btn btn--ghost" href="/rss.xml">
+          <Icon name="rss" class="icon" size={16} />
+          RSS
+        </a>
+      </div>
+
+      <div class="hero__stats">
+        <span class="hero__stat"><b>{String(postCount).padStart(2, '0')}</b> 篇文章</span>
+        <span class="hero__stat"><b>{String(tagCount).padStart(2, '0')}</b> 个标签</span>
+        <span class="hero__stat"><b>{years}</b> 年记录</span>
+        <span class="hero__stat mono">since {site.footer.since}</span>
+      </div>
+    </div>
+
+    <div class="terminal" aria-hidden="true">
+      <div class="terminal__bar">
+        <span class="terminal__dot"></span>
+        <span class="terminal__dot"></span>
+        <span class="terminal__dot"></span>
+        <span class="terminal__path">~/blog</span>
+      </div>
+      <div class="terminal__body">
+        <div class="terminal__line">
+          <span class="terminal__prompt">$</span><span class="terminal__cmd">whoami</span>
+        </div>
+        <div class="terminal__line"><span class="terminal__out">{site.author.name.toLowerCase()}</span></div>
+        <div class="terminal__line">
+          <span class="terminal__prompt">$</span><span class="terminal__cmd">cat focus.txt</span>
+        </div>
+        <div class="terminal__line"><span class="terminal__out">writing · reading · building</span></div>
+        <div class="terminal__line">
+          <span class="terminal__prompt">$</span><span class="terminal__cmd">ls -t posts | head -1</span>
+        </div>
+        <div class="terminal__line"><span class="terminal__out">{latestShort}</span></div>
+        <div class="terminal__line">
+          <span class="terminal__prompt">$</span><span class="terminal__cmd">echo $HOST</span>
+        </div>
+        <div class="terminal__line">
+          <span class="terminal__out">{host}</span><span class="terminal__cursor"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

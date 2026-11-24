@@ -1,0 +1,65 @@
+---
+import BlogLayout from '../layouts/BlogLayout.astro';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import Pagination from '../components/Pagination.astro';
+import type { GetStaticPaths, Page } from 'astro';
+import { countBy, getAllPosts, type Post } from '../utils/posts';
+import { site } from '../../site.config';
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const posts = await getAllPosts();
+  return paginate(posts, { pageSize: site.postsPerPage });
+};
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+const posts = await getAllPosts();
+const tags = countBy(posts, 'tags');
+const categories = countBy(posts, 'category');
+const isFirstPage = page.currentPage === 1;
+const list = page.data;
+---
+
+<BlogLayout
+  title={isFirstPage ? undefined : `第 ${page.currentPage} 页`}
+  description={site.description}
+  posts={posts}
+  tags={tags}
+  categories={categories}
+>
+  {
+    isFirstPage && (
+      <Fragment slot="hero">
+        <Hero postCount={posts.length} tagCount={tags.length} latestTitle={posts[0]?.data.title} />
+      </Fragment>
+    )
+  }
+
+  <section id="posts" aria-label="文章列表">
+    <div class="section-head">
+      <h2>{isFirstPage ? '最新文章' : `第 ${page.currentPage} 页`}</h2>
+      <a class="section-head__more" href="/archive/">归档 {posts.length} 篇 →</a>
+    </div>
+
+    {
+      list.length > 0 ? (
+        <div class="post-list">
+          {list.map((post, index) => (
+            <PostCard post={post} index={index} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <strong>这里还很安静</strong>
+          在 src/content/posts/ 里写下第一篇文章，它就会出现在这里。
+        </div>
+      )
+    }
+  </section>
+
+  <Pagination page={page} />
+</BlogLayout>

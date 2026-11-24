@@ -1,0 +1,97 @@
+/* ============================================================
+   设计令牌 —— 改这里就能整体换肤
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* 字体 */
+  --font-sans: 'Inter', 'HarmonyOS Sans SC', 'MiSans', 'PingFang SC', 'Hiragino Sans GB',
+    'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', system-ui, -apple-system,
+    'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', ui-monospace,
+    SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* 底色与文字 */
+  --bg: #fbfbf9;
+  --bg-muted: #f3f4f1;
+  --bg-elevated: #ffffff;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --text: #1b2129;
+  --text-secondary: #4c5561;
+  --text-muted: #6a7482;
+  --border: rgba(27, 33, 41, 0.09);
+  --border-strong: rgba(27, 33, 41, 0.16);
+
+  /* 主色：深海青 + 极光紫 */
+  --accent: #0a7e8f;
+  --accent-hover: #076a78;
+  --accent-soft: #e6f6f8;
+  --accent-ink: #075e6b;
+  --violet: #6a5ae8;
+  --pink: #e879a9;
+  --amber: #a86412;
+
+  /* 极光渐层 */
+  --aurora-1: rgba(34, 211, 238, 0.55);
+  --aurora-2: rgba(129, 140, 248, 0.5);
+  --aurora-3: rgba(232, 121, 169, 0.35);
+
+  /* 圆角 */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 13px;
+  --r-lg: 18px;
+  --r-xl: 26px;
+  --r-full: 999px;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px -2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 10px 30px -12px rgba(16, 24, 40, 0.16), 0 2px 8px -2px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 30px 70px -30px rgba(16, 24, 40, 0.28), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+
+  /* 尺寸 */
+  --container: 1120px;
+  --read: 720px;
+  --sidebar-w: 296px;
+  --header-h: 66px;
+  --gap: 40px;
+
+  /* 动效 */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.3s;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0b0f14;
+  --bg-muted: #10161d;
+  --bg-elevated: #121a22;
+  --surface: rgba(20, 28, 36, 0.66);
+  --surface-strong: rgba(22, 31, 40, 0.9);
+  --text: #e7eef5;
+  --text-secondary: #a7b3c0;
+  --text-muted: #77828f;
+  --border: rgba(231, 238, 245, 0.09);
+  --border-strong: rgba(231, 238, 245, 0.18);
+
+  --accent: #5fd3e6;
+  --accent-hover: #8be4f2;
+  --accent-soft: rgba(95, 211, 230, 0.12);
+  --accent-ink: #b8f0f9;
+  --violet: #a99bff;
+  --pink: #f0a0c4;
+  --amber: #e3ae5f;
+
+  --aurora-1: rgba(34, 211, 238, 0.3);
+  --aurora-2: rgba(129, 140, 248, 0.32);
+  --aurora-3: rgba(232, 121, 169, 0.18);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 14px 34px -16px rgba(0, 0, 0, 0.7), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 40px 80px -30px rgba(0, 0, 0, 0.8), 0 10px 30px -14px rgba(0, 0, 0, 0.5);
+}

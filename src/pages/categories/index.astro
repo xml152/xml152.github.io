@@ -1,0 +1,81 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { categoryUrl, countBy, getAllPosts } from '../../utils/posts';
+import { site } from '../../../site.config';
+
+const posts = await getAllPosts();
+const tags = countBy(posts, 'tags');
+const categories = countBy(posts, 'category');
+const max = Math.max(1, ...categories.map((c) => c.count));
+
+const withPreview = categories.map((cat) => {
+  const list = posts.filter((post) => post.data.category === cat.name);
+  return { ...cat, latest: list[0], count: list.length };
+});
+---
+
+<BlogLayout
+  title="分类"
+  description={`${site.title} 的全部文章分类，共 ${categories.length} 个。`}
+  posts={posts}
+  tags={tags}
+  categories={categories}
+>
+  <header class="page-header">
+    <span class="eyebrow">Categories</span>
+    <h1>分类</h1>
+    <p>共 {categories.length} 个分类，{posts.length} 篇文章。</p>
+  </header>
+
+  <div class="cat-grid">
+    {
+      withPreview.map((cat) => (
+        <a class="cat-card" href={categoryUrl(cat.name)}>
+          <span class="cat-card__name">
+            {cat.name}
+            <b>{String(cat.count).padStart(2, '0')}</b>
+          </span>
+          <span class="cat-card__desc">
+            {cat.latest ? `最近：${cat.latest.data.title}` : '暂无文章'}
+          </span>
+          <span class="cat-card__bar" style={`width:${Math.max(18, (cat.count / max) * 100)}%`} />
+        </a>
+      ))
+    }
+  </div>
+
+  {
+    categories.length === 0 && (
+      <div class="empty-state">
+        <strong>还没有分类</strong>
+        在文章 frontmatter 的 category 字段里指定分类。
+      </div>
+    )
+  }
+
+  <div class="cat-footnote">
+    <Icon name="folder" size={14} />
+    分类只用于粗粒度归档，更细的主题请使用标签。
+    <a href="/tags/">浏览标签 →</a>
+  </div>
+</BlogLayout>
+
+<style>
+  .cat-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .cat-footnote a {
+    margin-left: auto;
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,315 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { countBy, getAllPosts, totalWords } from '../utils/posts';
+import { site } from '../../site.config';
+
+const posts = await getAllPosts();
+const tags = countBy(posts, 'tags');
+const words = totalWords(posts);
+const years = new Date().getFullYear() - site.footer.since + 1;
+---
+
+<BaseLayout title="关于" description={`关于 ${site.author.name}：${site.author.bio}`}>
+  <div class="container container--narrow">
+    <header class="about-hero card">
+      <div class="about-hero__glow" aria-hidden="true"></div>
+      <img class="about-hero__avatar" src={site.author.avatar} alt={`${site.author.name} 的头像`} width="96" height="96" />
+      <div class="about-hero__main">
+        <span class="eyebrow">About</span>
+        <h1>{site.author.name}</h1>
+        <p class="about-hero__bio">{site.author.bio}</p>
+        <p class="about-hero__meta mono">
+          <span>{site.author.location}</span>
+          <span>·</span>
+          <span>{posts.length} 篇文章 / {words} 字</span>
+          <span>·</span>
+          <span>记录第 {years} 年</span>
+        </p>
+        <div class="about-hero__socials">
+          {
+            site.socials.map((item) => (
+              <a
+                class="btn btn--ghost"
+                href={item.href}
+                target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              >
+                <Icon name={item.icon} size={15} />
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </header>
+
+    <section class="about-section">
+      <h2><span class="num">01</span> 关于我</h2>
+      <p>
+        你好，我是 {site.author.name}。白天写后端代码，晚上看番、玩游戏，偶尔折腾工具、读点闲书，再把踩过的坑和想明白的事写下来。
+      </p>
+      <p>
+        我相信「把复杂的问题讲清楚」是一种能力，所以这里的文章尽量少一点术语堆砌，多一点前因后果。写作也是为了未来的自己——半年后回看，能想起当时为什么这么做。
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2><span class="num">02</span> 最近在做什么</h2>
+      <ul class="about-list">
+        <li><strong>写代码</strong>：维护几个自用的小工具，研究如何把 AI 融进日常开发流程。</li>
+        <li><strong>写东西</strong>：整理技术笔记，试着把零散的经验串成体系；偶尔也写点观后感。</li>
+        <li><strong>看番 / 玩游戏</strong>：动画、漫画、游戏都看一点，遇到喜欢的会记两句。</li>
+        <li><strong>读书</strong>：技术书与随笔各一半，读到有意思的会记在笔记里。</li>
+      </ul>
+    </section>
+
+    <section class="about-section">
+      <h2><span class="num">03</span> 这个站点</h2>
+      <p>
+        用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> + Markdown 搭建，静态托管在 GitHub Pages。
+        没有广告、没有追踪脚本，搜索索引在构建时本地生成。
+      </p>
+      <p>
+        模板由 <strong>DeepSeek</strong> 生成，配色、排版和栏目都集中在几个文件里，随时可以按自己的喜好调整。
+      </p>
+      <div class="about-tags">
+        {['Astro', 'Markdown', 'TypeScript', 'Pagefind', 'GitHub Pages'].map((item) => (
+          <span class="chip">{item}</span>
+        ))}
+        {tags.slice(0, 6).map((tag) => (
+          <a class="chip" href={`/tags/${encodeURIComponent(tag.name)}/`}>#{tag.name}</a>
+        ))}
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2><span class="num">04</span> 联系</h2>
+      <p>
+        欢迎交流技术、工具或任何有意思的话题。邮件通常比私信更容易被我看到。
+      </p>
+      <div class="about-contact">
+        <a class="about-contact__item" href={`mailto:${site.author.email}`}>
+          <Icon name="mail" size={17} />
+          <span>{site.author.email}</span>
+          <Icon name="arrow-right" size={14} />
+        </a>
+        <a class="about-contact__item" href={site.author.github} target="_blank" rel="noopener noreferrer">
+          <Icon name="github" size={17} />
+          <span>github.com/{site.author.github.split('/').pop()}</span>
+          <Icon name="external" size={13} />
+        </a>
+        <a class="about-contact__item" href="/rss.xml">
+          <Icon name="rss" size={17} />
+          <span>订阅 RSS</span>
+          <Icon name="arrow-right" size={14} />
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 26px;
+    margin: 42px 0 8px;
+    padding: 32px;
+    overflow: hidden;
+  }
+
+  .about-hero__glow {
+    position: absolute;
+    inset: -60% -20% auto;
+    height: 220px;
+    background: radial-gradient(50% 100% at 20% 50%, var(--aurora-1), transparent 70%),
+      radial-gradient(40% 100% at 70% 40%, var(--aurora-2), transparent 70%);
+    filter: blur(20px);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .about-hero__avatar {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    flex: none;
+    border-radius: 50%;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border), var(--shadow-md);
+  }
+
+  .about-hero__main {
+    position: relative;
+    min-width: 0;
+  }
+
+  .about-hero h1 {
+    margin: 6px 0 8px;
+    font-size: clamp(1.7rem, 1.4rem + 1.4vw, 2.2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.25;
+  }
+
+  .about-hero__bio {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.8;
+    max-width: 44em;
+  }
+
+  .about-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  .about-hero__socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .about-hero__socials .btn {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .about-section {
+    margin-top: 40px;
+  }
+
+  .about-section h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 1.18rem;
+    font-weight: 680;
+    letter-spacing: -0.01em;
+  }
+
+  .about-section h2 .num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--accent-soft);
+  }
+
+  .about-section p {
+    margin: 0.7em 0;
+    color: var(--text-secondary);
+    font-size: 15.2px;
+    line-height: 1.95;
+  }
+
+  .about-section a {
+    color: var(--accent-ink);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-underline-offset: 3px;
+  }
+
+  .about-section a:hover {
+    color: var(--accent);
+  }
+
+  .about-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .about-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  .about-list li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.78em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.7;
+  }
+
+  .about-list strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .about-contact {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .about-contact__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+
+  .about-contact__item span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .about-contact__item:hover {
+    color: var(--accent-ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    background: var(--accent-soft);
+  }
+
+  @media (max-width: 640px) {
+    .about-hero {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 26px 20px;
+    }
+
+    .about-hero__meta {
+      justify-content: center;
+    }
+
+    .about-hero__socials {
+      justify-content: center;
+    }
+  }
+</style>

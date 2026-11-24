@@ -1,0 +1,44 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import { countBy, getAllPosts, tagUrl } from '../../utils/posts';
+import { site } from '../../../site.config';
+
+const posts = await getAllPosts();
+const tags = countBy(posts, 'tags');
+const categories = countBy(posts, 'category');
+const max = Math.max(1, ...tags.map((t) => t.count));
+---
+
+<BlogLayout
+  title="标签"
+  description={`${site.title} 的全部标签，共 ${tags.length} 个。`}
+  posts={posts}
+  tags={tags}
+  categories={categories}
+>
+  <header class="page-header">
+    <span class="eyebrow">Tags</span>
+    <h1>标签</h1>
+    <p>共 {tags.length} 个标签，{posts.length} 篇文章。标签按文章数排序。</p>
+  </header>
+
+  <div class="tag-grid">
+    {
+      tags.map((tag) => (
+        <a href={tagUrl(tag.name)} style={`font-size:${(13 + (tag.count / max) * 3.5).toFixed(1)}px`}>
+          #{tag.name}
+          <b>{tag.count}</b>
+        </a>
+      ))
+    }
+  </div>
+
+  {
+    tags.length === 0 && (
+      <div class="empty-state">
+        <strong>还没有标签</strong>
+        在文章 frontmatter 的 tags 字段里添加标签。
+      </div>
+    )
+  }
+</BlogLayout>

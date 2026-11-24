@@ -1,0 +1,198 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Toc from '../../components/Toc.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../../site.config';
+import {
+  categoryUrl,
+  dateISO,
+  formatDate,
+  formatDateLong,
+  getAllPosts,
+  postCover,
+  postUrl,
+  readingTime,
+  relatedPosts,
+  tagUrl,
+  type Post,
+} from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const all = await getAllPosts();
+const index = all.findIndex((item) => item.id === post.id);
+const newer = index > 0 ? all[index - 1] : null;
+const older = index >= 0 && index < all.length - 1 ? all[index + 1] : null;
+const related = relatedPosts(all, post, 3);
+const { minutes, words } = readingTime(post.body ?? '');
+const cover = post.data.cover;
+const updated = post.data.updated;
+const showUpdated = updated && updated.getTime() - post.data.published.getTime() > 86400000;
+const description = post.data.description || `${post.data.title} · ${site.title}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description,
+  datePublished: post.data.published.toISOString(),
+  dateModified: (updated ?? post.data.published).toISOString(),
+  author: { '@type': 'Person', name: site.author.name, url: site.author.github },
+  image: new URL(postCover(post), site.url).href,
+  url: new URL(postUrl(post), site.url).href,
+  mainEntityOfPage: new URL(postUrl(post), site.url).href,
+  inLanguage: post.data.lang,
+  keywords: post.data.tags.join(', '),
+};
+---
+
+<BaseLayout title={post.data.title} description={description} type="article" image={cover ?? site.ogImage}>
+  <div class="read-progress" data-progress></div>
+
+  <div class="container">
+    <div class="post-layout">
+      <article class="post">
+        <header class="post-header">
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="/">首页</a>
+            <span class="sep">/</span>
+            <a href={categoryUrl(post.data.category)}>{post.data.category}</a>
+            <span class="sep">/</span>
+            <span aria-current="page">正文</span>
+          </nav>
+
+          <h1 class="post-title">{post.data.title}</h1>
+          {post.data.description && <p class="post-desc">{post.data.description}</p>}
+
+          <div class="post-meta">
+            <span class="post-meta__author">
+              <img src={site.author.avatar} alt="" width="26" height="26" />
+              {site.author.name}
+            </span>
+            <span>
+              <Icon name="calendar" size={13} />
+              <time datetime={dateISO(post.data.published)}>{formatDateLong(post.data.published)}</time>
+            </span>
+            <span>
+              <Icon name="clock" size={13} />
+              {minutes} 分钟 · {words} 字
+            </span>
+            <span>
+              <Icon name="folder" size={13} />
+              <a href={categoryUrl(post.data.category)}>{post.data.category}</a>
+            </span>
+            {
+              showUpdated && (
+                <span>
+                  <Icon name="sparkles" size={13} />
+                  更新于 {formatDate(updated!)}
+                </span>
+              )
+            }
+          </div>
+        </header>
+
+        {
+          cover && (
+            <div class="post-cover">
+              <img
+                src={cover}
+                alt={post.data.coverAlt ?? post.data.title}
+                width="1200"
+                height="514"
+                fetchpriority="high"
+              />
+            </div>
+          )
+        }
+
+        <div class="prose" data-article>
+          <Content />
+        </div>
+
+        <footer class="post-end">
+          {
+            post.data.tags.length > 0 && (
+              <div class="post-end__row">
+                <Icon name="tag" size={14} />
+                标签
+                <div class="post-end__tags">
+                  {post.data.tags.map((tag) => (
+                    <a class="chip" href={tagUrl(tag)}>
+                      #{tag}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <p class="post-end__license">
+            {site.footer.license
+              ? `本文采用 ${site.footer.license} 协议授权，转载请注明出处。`
+              : '转载请注明出处。'}
+            <br />
+            最后更新：{formatDate(updated ?? post.data.published)}
+          </p>
+
+          {(newer || older) && (
+            <nav class="post-nav" aria-label="前后文章">
+              {newer ? (
+                <a href={postUrl(newer)}>
+                  <span class="post-nav__label">← 较新一篇</span>
+                  <span class="post-nav__title">{newer.data.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+              {older ? (
+                <a class="post-nav__next" href={postUrl(older)}>
+                  <span class="post-nav__label">较早一篇 →</span>
+                  <span class="post-nav__title">{older.data.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+
+          {
+            related.length > 0 && (
+              <section class="related" aria-label="相关文章">
+                <h2 class="related__title">你可能还想读</h2>
+                <div class="related__list">
+                  {related.map((item) => (
+                    <a href={postUrl(item)}>
+                      <span>{item.data.title}</span>
+                      <time datetime={dateISO(item.data.published)}>{formatDate(item.data.published)}</time>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )
+          }
+        </footer>
+      </article>
+
+      <Toc headings={headings} min={site.tocDepth.min} max={site.tocDepth.max} />
+    </div>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>
+
+<style>
+  .post-nav > span:empty {
+    display: block;
+  }
+</style>

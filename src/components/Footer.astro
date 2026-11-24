@@ -1,0 +1,83 @@
+---
+import { site } from '../../site.config';
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+const since = site.footer.since;
+const copyright = since < year ? `${since}–${year}` : String(year);
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <a class="site-footer__brand" href="/">
+        <span class="brand__mark" aria-hidden="true">{site.title.slice(0, 1)}</span>
+        {site.title}
+      </a>
+
+      <nav class="site-footer__links" aria-label="页脚导航">
+        {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        <a href="/rss.xml">RSS</a>
+        {
+          site.author.github && (
+            <a href={site.author.github} target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          )
+        }
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {copyright} {site.author.name}. 保留所有权利。</p>
+
+      <div class="site-footer__meta">
+        {
+          site.footer.credit && (
+            <span class="site-footer__credit">
+              <Icon name="sparkles" size={12} />
+              {site.footer.credit}
+            </span>
+          )
+        }
+        {site.footer.license && <span>内容遵循 {site.footer.license} 协议</span>}
+        <span class="mono">Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a></span>
+        <span class="mono">Theme <span aria-hidden="true">·</span> Aurora</span>
+      </div>
+    </div>
+
+    {
+      site.footer.icp && (
+        <p class="site-footer__icp">
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            {site.footer.icp}
+          </a>
+        </p>
+      )
+    }
+  </div>
+</footer>
+
+<style>
+  .site-footer__credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 9px 1px 7px;
+    border: 1px dashed color-mix(in srgb, var(--accent) 28%, var(--border));
+    border-radius: var(--r-full);
+    color: var(--text-muted);
+    font-size: 11.5px;
+    line-height: 1.8;
+  }
+
+  .site-footer__credit :global(.icon) {
+    color: var(--accent);
+  }
+
+  .site-footer__icp {
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+</style>

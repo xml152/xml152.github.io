@@ -1,0 +1,208 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div class="search-overlay" data-search-overlay>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索文章">
+    <div class="search-field">
+      <Icon name="search" size={19} />
+      <input
+        type="search"
+        placeholder="搜索标题、标签或正文…"
+        aria-label="搜索关键词"
+        autocomplete="off"
+        spellcheck="false"
+        data-search-input
+      />
+      <kbd>ESC</kbd>
+    </div>
+
+    <div class="search-body" data-search-body>
+      <div class="search-hint">
+        <span><Icon name="hash" size={13} /> 试试「Astro」</span>
+        <span><Icon name="hash" size={13} /> 试试「效率」</span>
+        <span><Icon name="hash" size={13} /> 试试「随笔」</span>
+      </div>
+    </div>
+
+    <div class="search-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>↵</kbd> 打开</span>
+      <span><kbd>ESC</kbd> 关闭</span>
+      <span style="margin-left:auto">Powered by Pagefind</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  type PagefindResult = {
+    url: string;
+    excerpt: string;
+    meta?: { title?: string };
+  };
+
+  const overlay = document.querySelector<HTMLElement>('[data-search-overlay]');
+  const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+  const body = document.querySelector<HTMLElement>('[data-search-body]');
+
+  if (overlay && input && body) {
+    let pagefind: any = null;
+    let loading: Promise<any> | null = null;
+    let items: PagefindResult[] = [];
+    let active = 0;
+    let timer: number | undefined;
+    let lastFocus: HTMLElement | null = null;
+
+    const hintMarkup = body.innerHTML;
+
+    const escapeHtml = (value: string) =>
+      value.replace(
+        /[&<>"']/g,
+        (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] as string,
+      );
+
+    const loadPagefind = () => {
+      if (!loading) {
+        loading = (async () => {
+          const path = '/pagefind/pagefind.js';
+          const mod = await import(/* @vite-ignore */ path);
+          await mod.init();
+          return mod;
+        })();
+      }
+      return loading;
+    };
+
+    const showStatus = (title: string, detail = '') => {
+      items = [];
+      body.innerHTML = `<div class="search-status"><strong>${escapeHtml(title)}</strong>${escapeHtml(detail)}</div>`;
+    };
+
+    const setActive = (index: number) => {
+      const nodes = body.querySelectorAll<HTMLAnchorElement>('.search-result');
+      if (nodes.length === 0) return;
+      active = (index + nodes.length) % nodes.length;
+      nodes.forEach((node, i) => {
+        node.classList.toggle('is-active', i === active);
+        if (i === active) node.scrollIntoView({ block: 'nearest' });
+      });
+    };
+
+    const render = (list: PagefindResult[], total: number) => {
+      items = list;
+      if (list.length === 0) {
+        showStatus('没有找到相关文章', '换一个关键词，或者去归档页翻翻。');
+        return;
+      }
+      active = 0;
+      body.innerHTML = '';
+      const meta = document.createElement('div');
+      meta.className = 'search-results-meta';
+      meta.textContent = `${total} 条结果`;
+      body.append(meta);
+
+      list.forEach((item, index) => {
+        const link = document.createElement('a');
+        link.className = 'search-result';
+        link.href = item.url;
+        const title = item.meta?.title?.trim() || item.url;
+        link.innerHTML = `<div class="search-result__title">${escapeHtml(title)}</div><p class="search-result__excerpt">${item.excerpt}</p>`;
+        link.addEventListener('mouseenter', () => setActive(index));
+        body.append(link);
+      });
+      setActive(0);
+    };
+
+    const search = async (query: string) => {
+      const q = query.trim();
+      if (!q) {
+        body.innerHTML = hintMarkup;
+        items = [];
+        return;
+      }
+      showStatus('搜索中…');
+      try {
+        if (!pagefind) pagefind = await loadPagefind();
+        const result = await pagefind.search(q);
+        const data = await Promise.all(
+          result.results.slice(0, 12).map((r: any) => r.data() as Promise<PagefindResult>),
+        );
+        render(data, result.results.length);
+      } catch {
+        showStatus('搜索索引还未生成', '本地开发时请先执行一次 npm run build，或直接使用 npm run preview。');
+      }
+    };
+
+    const open = () => {
+      lastFocus = document.activeElement as HTMLElement;
+      overlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      window.setTimeout(() => {
+        input.focus();
+        input.select();
+      }, 40);
+    };
+
+    const close = () => {
+      overlay.classList.remove('is-open');
+      document.body.style.overflow = '';
+      lastFocus?.focus();
+    };
+
+    document.querySelectorAll('[data-search-open]').forEach((btn) => {
+      btn.addEventListener('click', open);
+    });
+
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) close();
+    });
+
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => search(input.value), 150);
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setActive(active + 1);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setActive(active - 1);
+      } else if (event.key === 'Enter') {
+        const target = items[active];
+        if (target) {
+          event.preventDefault();
+          window.location.href = target.url;
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const isOpen = overlay.classList.contains('is-open');
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        isOpen ? close() : open();
+        return;
+      }
+      if (event.key === 'Escape' && isOpen) {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key === 'Tab' && isOpen) {
+        const focusables = overlay.querySelectorAll<HTMLElement>('input, a, button');
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+</script>

@@ -1,0 +1,17 @@
+# Pagefind 配置：构建后扫描 dist，生成静态搜索索引
+site: dist
+
+# 只索引正文，避免导航、侧栏、页脚进入搜索结果
+root_selector: "main"
+exclude_selectors:
+  - ".hero"
+  - ".layout__aside"
+  - ".post-layout__aside"
+  - ".breadcrumb"
+  - ".post-meta"
+  - ".pager"
+  - ".post-end"
+  - ".notfound"
+
+# 摘要长度（单词数），中文环境下够用了
+excerpt_length: 32

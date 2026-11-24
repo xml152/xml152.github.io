@@ -1,0 +1,77 @@
+---
+import BlogLayout from '../layouts/BlogLayout.astro';
+import Icon from '../components/Icon.astro';
+import {
+  categoryUrl,
+  countBy,
+  formatDate,
+  getAllPosts,
+  groupByYear,
+  postUrl,
+} from '../utils/posts';
+import { site } from '../../site.config';
+
+const posts = await getAllPosts();
+const tags = countBy(posts, 'tags');
+const categories = countBy(posts, 'category');
+const groups = groupByYear(posts);
+---
+
+<BlogLayout
+  title="归档"
+  description={`${site.title} 的全部文章归档，共 ${posts.length} 篇。`}
+  posts={posts}
+  tags={tags}
+  categories={categories}
+>
+  <header class="page-header">
+    <span class="eyebrow">Archive</span>
+    <h1>全部归档</h1>
+    <p>共 {posts.length} 篇文章，按发布时间倒序排列。也可以按分类或标签浏览。</p>
+    <div class="filter-bar">
+      <a class="chip chip--accent" href="/archive/">
+        <Icon name="archive" size={12} /> 时间
+      </a>
+      {
+        categories.map((cat) => (
+          <a class="chip" href={categoryUrl(cat.name)}>
+            {cat.name} <sup>{cat.count}</sup>
+          </a>
+        ))
+      }
+    </div>
+  </header>
+
+  <div class="archive">
+    {
+      groups.map(({ year, posts: items }) => (
+        <section aria-labelledby={`year-${year}`}>
+          <div class="archive-year">
+            <h2 id={`year-${year}`}>{year}</h2>
+            <span>{items.length} articles</span>
+          </div>
+          <div class="archive-list">
+            {items.map((post) => (
+              <div class="archive-item">
+                <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published).slice(5)}</time>
+                <a href={postUrl(post)}>{post.data.title}</a>
+                <a class="chip" href={categoryUrl(post.data.category)}>
+                  {post.data.category}
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      posts.length === 0 && (
+        <div class="empty-state">
+          <strong>还没有文章</strong>
+          在 src/content/posts/ 下新建 Markdown 文件即可开始。
+        </div>
+      )
+    }
+  </div>
+</BlogLayout>

@@ -1,0 +1,126 @@
+---
+import { site } from '../../site.config';
+import type { Post } from '../utils/posts';
+import { formatDate, totalWords } from '../utils/posts';
+import Icon from './Icon.astro';
+
+interface Props {
+  posts: Post[];
+  tags: { name: string; count: number }[];
+  categories: { name: string; count: number }[];
+}
+
+const { posts, tags, categories } = Astro.props;
+
+const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n));
+const words = totalWords(posts);
+const recent = posts.slice(0, site.recentCount);
+const topTags = tags.slice(0, 14);
+---
+
+<aside class="layout__aside" aria-label="站点信息">
+  <div class="card profile">
+    <div class="profile__avatar">
+      <img src={site.author.avatar} alt={`${site.author.name} 的头像`} width="78" height="78" loading="lazy" />
+    </div>
+    <p class="profile__name">{site.author.name}</p>
+    <p class="profile__bio">{site.author.bio}</p>
+
+    <div class="profile__socials">
+      {
+        site.socials.map((item) => (
+          <a
+            href={item.href}
+            aria-label={item.label}
+            title={item.label}
+            target={item.href.startsWith('http') ? '_blank' : undefined}
+            rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+          >
+            <Icon name={item.icon} size={15} />
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="profile__stats">
+      <div class="profile__stat">
+        <b>{String(posts.length).padStart(2, '0')}</b>
+        <span>文章</span>
+      </div>
+      <div class="profile__stat">
+        <b>{fmt(words)}</b>
+        <span>字数</span>
+      </div>
+      <div class="profile__stat">
+        <b>{String(tags.length).padStart(2, '0')}</b>
+        <span>标签</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel__title">
+      最近更新
+      <span>{recent.length} / {posts.length}</span>
+    </div>
+    <div class="recent-list">
+      {
+        recent.map((post) => (
+          <a href={`/posts/${post.id}/`}>
+            <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published).slice(5)}</time>
+            <span>{post.data.title}</span>
+          </a>
+        ))
+      }
+      {recent.length === 0 && <p class="toc__empty">还没有文章。</p>}
+    </div>
+  </div>
+
+  {
+    topTags.length > 0 && (
+      <div class="panel">
+        <div class="panel__title">
+          标签
+          <span>
+            <a href="/tags/">全部 →</a>
+          </span>
+        </div>
+        <div class="tag-cloud">
+          {topTags.map((tag) => (
+            <a class="chip" href={`/tags/${encodeURIComponent(tag.name)}/`}>
+              {tag.name}
+              <sup>{tag.count}</sup>
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    categories.length > 0 && (
+      <div class="panel">
+        <div class="panel__title">
+          分类
+          <span>
+            <a href="/categories/">全部 →</a>
+          </span>
+        </div>
+        <div class="cat-list">
+          {categories.slice(0, 6).map((cat) => (
+            <a href={`/categories/${encodeURIComponent(cat.name)}/`}>
+              <span>{cat.name}</span>
+              <b>{cat.count}</b>
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  <div class="side-note">
+    <strong>// tips</strong>
+    <br />
+    按 <kbd>Ctrl</kbd> + <kbd>K</kbd> 随时搜索全站文章，按 <kbd>Esc</kbd> 关闭。
+  </div>
+</aside>

@@ -1,0 +1,80 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { countBy, getAllPosts, type Post } from '../../utils/posts';
+import { site } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  const tags = countBy(posts, 'tags');
+  return tags.map(({ name }) => ({
+    params: { tag: name },
+    props: { tag: name, posts: posts.filter((post) => post.data.tags.includes(name)) },
+  }));
+}
+
+interface Props {
+  tag: string;
+  posts: Post[];
+}
+
+const { tag, posts } = Astro.props;
+const all = await getAllPosts();
+const tags = countBy(all, 'tags');
+const categories = countBy(all, 'category');
+---
+
+<BlogLayout
+  title={`标签 · ${tag}`}
+  description={`${site.title} 中带有「${tag}」标签的文章，共 ${posts.length} 篇。`}
+  posts={all}
+  tags={tags}
+  categories={categories}
+>
+  <header class="page-header">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="/">首页</a>
+      <span class="sep">/</span>
+      <a href="/tags/">标签</a>
+      <span class="sep">/</span>
+      <span aria-current="page">{tag}</span>
+    </nav>
+    <h1><span class="tag-hash">#</span>{tag}</h1>
+    <p>共 {posts.length} 篇相关文章。</p>
+  </header>
+
+  <div class="post-list">
+    {posts.map((post, index) => <PostCard post={post} index={index} />)}
+  </div>
+
+  <a class="back-link" href="/tags/">
+    <Icon name="arrow-left" size={14} />
+    返回全部标签
+  </a>
+</BlogLayout>
+
+<style>
+  .tag-hash {
+    margin-right: 6px;
+    background: linear-gradient(120deg, var(--accent), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: var(--font-mono);
+    font-weight: 800;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 30px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+  }
+</style>

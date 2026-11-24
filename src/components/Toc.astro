@@ -1,0 +1,97 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  min?: number;
+  max?: number;
+}
+
+const { headings, min = 2, max = 3 } = Astro.props;
+const items = headings.filter((h) => h.depth >= min && h.depth <= max);
+---
+
+<aside class="post-layout__aside">
+  <nav class="toc" aria-label="文章目录">
+    <p class="toc__title">Contents</p>
+    {
+      items.length > 0 ? (
+        <ul class="toc__list">
+          {items.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} data-depth={h.depth}>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="toc__empty">本文没有小标题</p>
+      )
+    }
+  </nav>
+</aside>
+
+<script>
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc__list a'));
+  if (links.length > 0) {
+    const targets = links
+      .map((link) => {
+        const href = link.getAttribute('href') ?? '';
+        return document.getElementById(decodeURIComponent(href.replace(/^#/, '')));
+      })
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    let current = -1;
+    let ticking = false;
+
+    const setActive = (index: number) => {
+      if (index === current) return;
+      current = index;
+      links.forEach((link, i) => {
+        link.classList.toggle('is-active', i === index);
+        if (i === index) {
+          link.setAttribute('aria-current', 'true');
+          const toc = link.closest('.toc');
+          if (toc) {
+            const top = link.offsetTop;
+            const viewTop = toc.scrollTop;
+            if (top < viewTop + 40 || top > viewTop + toc.clientHeight - 60) {
+              toc.scrollTo({ top: Math.max(0, top - toc.clientHeight / 2), behavior: 'smooth' });
+            }
+          }
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    };
+
+    const update = () => {
+      ticking = false;
+      const offset = 96;
+      let index = 0;
+      targets.forEach((el, i) => {
+        if (el.getBoundingClientRect().top <= offset) index = i;
+      });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120) {
+        index = targets.length - 1;
+      }
+      setActive(index);
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+</script>

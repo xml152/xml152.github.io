@@ -1,0 +1,76 @@
+---
+import { site } from '../../site.config';
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => {
+  if (href === '/') return path === '/' || /^\/\d+\/$/.test(path);
+  return path === href || path.startsWith(href);
+};
+---
+
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label={`${site.title} 首页`}>
+      <span class="brand__mark" aria-hidden="true">{site.title.slice(0, 1)}</span>
+      <span class="brand__text">
+        {site.title}
+        <span class="brand__suffix">.blog</span>
+      </span>
+    </a>
+
+    <nav class="site-nav" id="site-nav" data-nav aria-label="主导航">
+      <ul>
+        {
+          site.nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {item.icon && <Icon name={item.icon} class="icon" />}
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button class="search-trigger" type="button" data-search-open aria-label="搜索文章">
+        <Icon name="search" class="icon" size={16} />
+        <span class="search-trigger__label">搜索</span>
+        <kbd data-kbd-hint>Ctrl K</kbd>
+      </button>
+
+      {
+        site.author.github && (
+          <a
+            class="icon-btn icon-btn--bare"
+            href={site.author.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+          >
+            <Icon name="github" size={18} />
+          </a>
+        )
+      }
+
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="切换深浅色">
+        <Icon name="moon" class="icon-moon" size={17} />
+        <Icon name="sun" class="icon-sun" size={17} />
+      </button>
+
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-label="菜单"
+        aria-expanded="false"
+        aria-controls="site-nav"
+      >
+        <Icon name="menu" class="icon-menu" size={18} />
+        <Icon name="close" class="icon-close" size={18} />
+      </button>
+    </div>
+  </div>
+</header>

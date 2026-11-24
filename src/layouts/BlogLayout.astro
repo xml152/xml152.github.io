@@ -1,0 +1,29 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import type { Post } from '../utils/posts';
+
+interface Props {
+  title?: string;
+  description?: string;
+  posts: Post[];
+  tags: { name: string; count: number }[];
+  categories: { name: string; count: number }[];
+  /** 列表类页面默认不进搜索索引 */
+  searchIgnore?: boolean;
+}
+
+const { title, description, posts, tags, categories, searchIgnore = true } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} searchIgnore={searchIgnore}>
+  <div class="container">
+    <slot name="hero" />
+    <div class="layout">
+      <div class="layout__main">
+        <slot />
+      </div>
+      <Sidebar posts={posts} tags={tags} categories={categories} />
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,70 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { countBy, getAllPosts, type Post } from '../../utils/posts';
+import { site } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  const categories = countBy(posts, 'category');
+  return categories.map(({ name }) => ({
+    params: { category: name },
+    props: { category: name, posts: posts.filter((post) => post.data.category === name) },
+  }));
+}
+
+interface Props {
+  category: string;
+  posts: Post[];
+}
+
+const { category, posts } = Astro.props;
+const all = await getAllPosts();
+const tags = countBy(all, 'tags');
+const categories = countBy(all, 'category');
+---
+
+<BlogLayout
+  title={`分类 · ${category}`}
+  description={`${site.title} 中「${category}」分类下的文章，共 ${posts.length} 篇。`}
+  posts={all}
+  tags={tags}
+  categories={categories}
+>
+  <header class="page-header">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="/">首页</a>
+      <span class="sep">/</span>
+      <a href="/categories/">分类</a>
+      <span class="sep">/</span>
+      <span aria-current="page">{category}</span>
+    </nav>
+    <h1>{category}</h1>
+    <p>共 {posts.length} 篇文章。</p>
+  </header>
+
+  <div class="post-list">
+    {posts.map((post, index) => <PostCard post={post} index={index} />)}
+  </div>
+
+  <a class="back-link" href="/categories/">
+    <Icon name="arrow-left" size={14} />
+    返回全部分类
+  </a>
+</BlogLayout>
+
+<style>
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 30px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+  }
+</style>

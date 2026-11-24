@@ -1,0 +1,83 @@
+---
+import type { Post } from '../utils/posts';
+import { categoryUrl, formatDate, postCover, postUrl, readingTime, tagUrl } from '../utils/posts';
+import Icon from './Icon.astro';
+
+interface Props {
+  post: Post;
+  index?: number;
+  /** 是否展示封面图 */
+  cover?: boolean;
+}
+
+const { post, index = 0, cover = true } = Astro.props;
+const { minutes, words } = readingTime(post.body ?? '');
+const url = postUrl(post);
+const tags = post.data.tags.slice(0, 3);
+---
+
+<article
+  class:list={['post-card', { 'post-card--pinned': post.data.pinned, 'post-card--nocover': !cover }]}
+  data-reveal
+  style={`--i:${index}`}
+>
+  <div class="post-card__body">
+    <div class="post-card__top">
+      <a class="post-card__cat" href={categoryUrl(post.data.category)}>{post.data.category}</a>
+      {
+        post.data.pinned && (
+          <span class="post-card__pin">
+            <Icon name="pin" class="icon" size={11} />
+            置顶
+          </span>
+        )
+      }
+      {import.meta.env.DEV && post.data.draft && <span class="chip chip--muted">草稿</span>}
+    </div>
+
+    <h3 class="post-card__title">
+      <a href={url}>{post.data.title}</a>
+    </h3>
+
+    {post.data.description && <p class="post-card__desc">{post.data.description}</p>}
+
+    {
+      tags.length > 0 && (
+        <div class="post-card__tags">
+          {tags.map((tag) => (
+            <a class="chip" href={tagUrl(tag)}>
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
+
+    <div class="post-card__meta">
+      <span>
+        <Icon name="calendar" class="icon" size={13} />
+        <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+      </span>
+      <span>
+        <Icon name="clock" class="icon" size={13} />
+        {minutes} 分钟
+      </span>
+      <span class="mono">{words} 字</span>
+    </div>
+  </div>
+
+  {
+    cover && (
+      <a class="post-card__media" href={url} tabindex="-1" aria-hidden="true">
+        <img
+          src={postCover(post)}
+          alt={post.data.coverAlt ?? ''}
+          loading="lazy"
+          decoding="async"
+          width="392"
+          height="264"
+        />
+      </a>
+    )
+  }
+</article>

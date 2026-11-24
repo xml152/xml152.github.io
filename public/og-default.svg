@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#080b12" />
+      <stop offset="60%" stop-color="#0b1020" />
+      <stop offset="100%" stop-color="#100b26" />
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="52%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+    <radialGradient id="g1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity=".5" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g2">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity=".55" />
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g3">
+      <stop offset="0%" stop-color="#e879a9" stop-opacity=".35" />
+      <stop offset="100%" stop-color="#e879a9" stop-opacity="0" />
+    </radialGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="60" />
+    </filter>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0H0V60" fill="none" stroke="#ffffff" stroke-opacity=".07" />
+    </pattern>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#dbeafe" />
+      <stop offset="100%" stop-color="#c4b5fd" />
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080b12" stop-opacity="0" />
+      <stop offset="100%" stop-color="#080b12" stop-opacity=".7" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <ellipse cx="180" cy="120" rx="420" ry="320" fill="url(#g1)" filter="url(#blur)" />
+  <ellipse cx="980" cy="520" rx="480" ry="360" fill="url(#g2)" filter="url(#blur)" />
+  <ellipse cx="760" cy="80" rx="320" ry="240" fill="url(#g3)" filter="url(#blur)" />
+  <rect width="1200" height="630" fill="url(#grid)" />
+  <rect width="1200" height="630" fill="url(#fade)" />
+
+  <g fill="none" stroke="#a5b4fc" stroke-opacity=".16">
+    <circle cx="1060" cy="150" r="170" stroke-width="1.6" />
+    <circle cx="1060" cy="150" r="250" stroke-width="1" stroke-dasharray="3 14" />
+    <circle cx="1060" cy="150" r="330" stroke-width="1" stroke-opacity=".08" />
+  </g>
+
+  <g transform="translate(88 74)">
+    <rect width="58" height="58" rx="15" fill="url(#mark)" />
+    <text x="29" y="40" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" fill="#ffffff">逊</text>
+    <text x="78" y="38" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" letter-spacing="1">逊懵泷<tspan fill="#94a3b8" font-weight="400">.blog</tspan></text>
+  </g>
+
+  <text x="88" y="300" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="82" font-weight="700" fill="url(#title)" letter-spacing="-1">逊懵泷的博客</text>
+  <text x="90" y="366" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" fill="#9fb0c6">在代码与生活之间，记录一些认真想过的事。</text>
+
+  <g transform="translate(88 500)">
+    <rect width="4" height="26" rx="2" fill="#22d3ee" />
+    <text x="18" y="20" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" fill="#8ea1b8" letter-spacing=".5">xml152.github.io</text>
+  </g>
+
+  <text x="1112" y="522" text-anchor="end" font-family="SFMono-Regular, Consolas, Microsoft YaHei, monospace" font-size="16" fill="#6b7c92" letter-spacing="1.5">ASTRO · MARKDOWN · PAGES</text>
+</svg>
