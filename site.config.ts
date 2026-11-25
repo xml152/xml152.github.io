@@ -58,7 +58,7 @@ export const site = {
 
   footer: {
     /** 版权起始年份 */
-    since: 2024,
+    since: 2026,
     /** 内容协议，留空则不展示 */
     license: 'CC BY-NC-SA 4.0',
     /** 备案号，留空则不展示 */
