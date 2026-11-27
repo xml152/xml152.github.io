@@ -4,7 +4,7 @@ description: '在 x86 上用 rknn-toolkit2 把 YOLO26 转成 RKNN 模型（含�
 published: 2026-11-27
 category: 技术
 tags: ['瑞芯微', 'rk3588', 'RKNN', '模型部署']
-cover: /covers/rknn&yolo26.jpg
+cover: /covers/rknn-yolo26.jpg
 coverAlt: 'RKNN & YOLO26 模型部署'
 pinned: true
 ---
